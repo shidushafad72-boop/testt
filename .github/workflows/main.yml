@@ -1,0 +1,33 @@
+name: Create Torrent
+
+on:
+  push:
+    paths:
+      - 'files/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install mktorrent
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mktorrent
+
+      - name: Create torrent file
+        run: |
+          mkdir output
+          mktorrent \
+            -a udp://tracker.openbittorrent.com:6969/announce \
+            -o output/file.torrent \
+            files/
+
+      - name: Upload torrent artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: torrent-file
+          path: output/
